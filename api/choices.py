@@ -26,3 +26,9 @@ DOSE_CHOICES = [
     ('шт', 'шт'),
     ('мл', 'мл'),
 ]
+DEVISE_CHOICES = [
+    ('tablet', 'tablet'),
+    ('phone', 'phone'),
+    ('notebook', 'notebook'),
+    ('desktop', 'desktop'),
+]

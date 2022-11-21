@@ -1,12 +1,10 @@
 # Create your models here.
 from choices import COLORS_CHOICES, LANGUAGE_CHOICES
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.models import UserManager
-from django.contrib.auth.models import User
 
 
 # class CustomUserManager(BaseUserManager):
@@ -57,6 +55,33 @@ class Patient(models.Model):
     first_name = models.CharField(_('first name'), max_length=150, blank=True)
     last_name = models.CharField(_('last name'), max_length=150, blank=True)
     email = models.EmailField(_('email address'), blank=True)
+    is_active = models.BooleanField(
+        _('active'),
+        default=True,
+        help_text=_(
+            'Designates whether this user should be treated as active. '
+            'Unselect this instead of deleting accounts.'
+        ),
+    )
+    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
+    age = models.PositiveIntegerField(verbose_name=_('age'), validators=[MaxValueValidator(150)])
+    phone = models.BigIntegerField(verbose_name=_('phone'), default=0, blank=True, unique=True)
+
+    # EMAIL_FIELD = 'email'
+    # USERNAME_FIELD = 'phone'
+    # REQUIRED_FIELDS = ['phone']
+    def __str__(self):
+        return self.first_name + " " + self.last_name
+
+
+class Guardian(models.Model):
+    banned = models.BooleanField(_('banned'), help_text="Был ли он забанен опекуном через администратора")
+    is_send = models.BooleanField(_('is_send'), help_text="отправлять ли отчеты об опекуне")
+    relationship = models.CharField(_('relationship'), max_length=150, blank=True, help_text="родство с опекуном")
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    first_name = models.CharField(_('first name'), max_length=150, blank=True)
+    last_name = models.CharField(_('last name'), max_length=150, blank=True)
+    email = models.EmailField(_('email address'), blank=True)
     is_staff = models.BooleanField(
         _('staff status'),
         default=False,
@@ -70,16 +95,12 @@ class Patient(models.Model):
             'Unselect this instead of deleting accounts.'
         ),
     )
-    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
-    age = models.PositiveIntegerField(verbose_name=_('age'), validators=[MaxValueValidator(150)])
     phone = models.BigIntegerField(verbose_name=_('phone'), default=0, blank=True, unique=True)
-    care_about = models.ManyToManyField('self',verbose_name=_('care about'),blank=True,null=True)
+    care_about = models.ManyToManyField(Patient, verbose_name=_('care about'), blank=True, null=True)
 
-    # EMAIL_FIELD = 'email'
-    # USERNAME_FIELD = 'phone'
-    # REQUIRED_FIELDS = ['phone']
     def __str__(self):
-        return self.first_name+" "+self.last_name
+        return self.first_name + " " + self.last_name
+
 
 class PatientSetting(models.Model):
     patient = models.OneToOneField(Patient, verbose_name=_('patient'), on_delete=models.CASCADE)
@@ -89,15 +110,37 @@ class PatientSetting(models.Model):
     language = models.CharField(verbose_name=_("language"), max_length=255, choices=LANGUAGE_CHOICES)
 
 
-class Report(models.Model):
-    patient = models.ForeignKey(Patient, verbose_name=_("user"), on_delete=models.CASCADE)
+class Tokens(models.Model):
+    token = models.CharField(verbose_name=_("action"), max_length=255)
+    date = models.DateTimeField(verbose_name=_("date"))
+    user = models.ForeignKey(Patient, on_delete=models.CASCADE)
+
+
+class Tariff(models.Model):
+    price = models.DecimalField(verbose_name=_("price"), max_digits=20, decimal_places=12)
+    date = models.DateTimeField(verbose_name=_("date_start"))
+    duration_days = models.PositiveIntegerField(verbose_name=_("duration_days"))
+    user = models.ForeignKey(Patient, on_delete=models.CASCADE)
+
+
+class Tranzaction(models.Model):
+    bill = models.CharField(verbose_name=_("acbilltion"), max_length=255)
+    date = models.DateTimeField(verbose_name=_("date_start"))
+    method = models.CharField(verbose_name=_("billing method"), max_length=255)
+    user = models.ForeignKey(Patient, on_delete=models.CASCADE)
+
+
+class Label(models.Model):
+    user = models.ManyToManyField(Patient)
     title = models.CharField(verbose_name=_("title"), max_length=255)
 
-    class Meta:
-        unique_together = [('patient', 'title')]
 
+class Achievement(models.Model):
+    user = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    days_attended = models.PositiveIntegerField(verbose_name=_("days_attended"))
+    days_no_miss = models.PositiveIntegerField(verbose_name=_("days_no_miss"))
+    number_in_time = models.PositiveIntegerField(verbose_name=_("number_in_time"))
 
-class ReportDot(models.Model):
-    report = models.ForeignKey(Report, verbose_name=_('report'), on_delete=models.CASCADE)
-    x = models.FloatField(verbose_name="x")
-    y = models.FloatField(verbose_name="y")
+    # Гуишкой похвалу
+    praise_from_guard = models.PositiveIntegerField(verbose_name=_("praise_from_guard"),
+                                                    help_text="количество раз похвалы")
