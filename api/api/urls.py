@@ -20,5 +20,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('managment/', include('managment.urls')),
     path('medicine/', include('medicine.urls')),
-    path('statistic/', include('statistic.urls'))
+    path('statistic/', include('statistic.urls')),
+    path('api/v1/auth/',include('djoser.urls')),
+    path('api/v1/auth-token/',include('djoser.urls.authtoken')),
 ]
