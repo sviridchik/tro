@@ -1,5 +1,5 @@
 # Create your models here.
-from choices import COLORS_CHOICES, LANGUAGE_CHOICES
+from choices import COLORS_CHOICES, LANGUAGE_CHOICES, SPEC_CHOICES
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator
 from django.db import models
@@ -130,17 +130,14 @@ class Tranzaction(models.Model):
     user = models.ForeignKey(Patient, on_delete=models.CASCADE)
 
 
-class Label(models.Model):
+
+class Doctor(models.Model):
+    first_name = models.CharField(_('first name'), max_length=150, blank=True)
+    last_name = models.CharField(_('last name'), max_length=150, blank=True)
+    specialty = models.CharField(_('specialty'), max_length=150, blank=True,choices=SPEC_CHOICES)
+
+
+class DoctorVisit(models.Model):
     user = models.ManyToManyField(Patient)
-    title = models.CharField(verbose_name=_("title"), max_length=255)
-
-
-class Achievement(models.Model):
-    user = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    days_attended = models.PositiveIntegerField(verbose_name=_("days_attended"))
-    days_no_miss = models.PositiveIntegerField(verbose_name=_("days_no_miss"))
-    number_in_time = models.PositiveIntegerField(verbose_name=_("number_in_time"))
-
-    # Гуишкой похвалу
-    praise_from_guard = models.PositiveIntegerField(verbose_name=_("praise_from_guard"),
-                                                    help_text="количество раз похвалы")
+    date = models.DateTimeField(verbose_name=_("date_start"))
+    doctor = models.ForeignKey(Doctor, on_delete=models.DO_NOTHING)

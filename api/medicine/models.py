@@ -4,16 +4,19 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from managment.models import Patient
 
+
+class TimeTable(models.Model):
+    time = models.TimeField(verbose_name=_("time"))
+    # schedule = models.ForeignKey(Schedule, verbose_name=_('schedule'), on_delete = models.CASCADE)
+
+
 class Schedule(models.Model):
     cycle_start = models.DateField(verbose_name=_("start of the cycle"))
     cycle_end = models.DateField(verbose_name=_("end of the cycle"))
     frequency = models.PositiveIntegerField(verbose_name=_("frequency"))
-    strict_status = models.CharField(verbose_name=_("strict"), max_length=255)
+    strict_status = models.BooleanField(verbose_name=_("strict"), max_length=255)
+    timesheet = models.ManyToManyField(TimeTable, verbose_name=_('time'))
 
-
-class TimeTable(models.Model):
-    time = models.TimeField(verbose_name=_("time"))
-    schedule = models.ForeignKey(Schedule, verbose_name=_('schedule'), on_delete = models.CASCADE)
 
 
 class Cure(models.Model):
@@ -23,3 +26,6 @@ class Cure(models.Model):
     dose_type = models.CharField(verbose_name=_("dose type"), max_length=255, choices=DOSE_CHOICES)
     schedule = models.ForeignKey(Schedule, verbose_name=_("schedule"), on_delete=models.CASCADE)
     type = models.CharField(verbose_name=_("type"), max_length=255, choices=TYPE_CHOICES)
+
+    def __str__(self):
+        return self.title

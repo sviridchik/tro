@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Patient, PatientSetting, Guardian, Tariff, Tokens, Tranzaction, Label, Achievement
+from .models import Patient, PatientSetting, Guardian, Tariff, Tokens, Tranzaction
 # Register your models here.
 @admin.register(Patient)
 class PatientAdmin(admin.ModelAdmin):
@@ -23,12 +23,4 @@ class TokensAdmin(admin.ModelAdmin):
 
 @admin.register(Tranzaction)
 class TranzactionAdmin(admin.ModelAdmin):
-    pass
-
-@admin.register(Label)
-class LabelAdmin(admin.ModelAdmin):
-    pass
-
-@admin.register(Achievement)
-class AchievementAdmin(admin.ModelAdmin):
     pass

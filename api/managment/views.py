@@ -1,8 +1,8 @@
 from rest_framework import viewsets
 
-from .models import Patient,PatientSetting,Guardian,Tariff,Tokens,Tranzaction,Label,Achievement
+from .models import Patient,PatientSetting,Guardian,Tariff,Tokens,Tranzaction,Doctor,DoctorVisit
 from .serializers import PatientSerializer, PatientSettingSerializer, GuardianSerializer, TariffSerializer, \
-    TokensSerializer,TranzactionSerializer,LabelSerializer,AchievementSerializer
+    TokensSerializer,TranzactionSerializer, DoctorVisitSerializer,DoctorSerializer
 
 
 class PatientViewSet(viewsets.ModelViewSet):
@@ -36,11 +36,12 @@ class TranzactionViewSet(viewsets.ModelViewSet):
     serializer_class = TranzactionSerializer
 
 
-class LabelViewSet(viewsets.ModelViewSet):
-    queryset = Label.objects.all()
-    serializer_class = LabelSerializer
+
+class DoctorViewSet(viewsets.ModelViewSet):
+    queryset = Doctor.objects.all()
+    serializer_class = DoctorSerializer
 
 
-class AchievementViewSet(viewsets.ModelViewSet):
-    queryset = Achievement.objects.all()
-    serializer_class = AchievementSerializer
+class DoctorVisitViewSet(viewsets.ModelViewSet):
+    queryset = DoctorVisit.objects.all()
+    serializer_class = DoctorVisitSerializer

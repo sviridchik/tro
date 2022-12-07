@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Devise, Logs, MissedMed, TakenMed,Report,ReportDot
+from .models import Devise, Logs, MissedMed, TakenMed,Report,ReportDot,Label,Achievement
 
 
 @admin.register(Devise)
@@ -24,4 +24,13 @@ class ReportAdmin(admin.ModelAdmin):
 
 @admin.register(ReportDot)
 class ReportDotAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Label)
+class LabelAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(Achievement)
+class AchievementAdmin(admin.ModelAdmin):
     pass

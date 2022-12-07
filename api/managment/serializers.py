@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Patient, PatientSetting, Guardian, Tariff, Tokens, Tranzaction, Label, Achievement
+from .models import Patient, PatientSetting, Guardian, Tariff, Tokens, Tranzaction,Doctor,DoctorVisit
 
 
 class PatientSerializer(serializers.ModelSerializer):
@@ -39,13 +39,14 @@ class TranzactionSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class LabelSerializer(serializers.ModelSerializer):
+
+
+class DoctorSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Label
+        model = Doctor
         fields = "__all__"
 
-
-class AchievementSerializer(serializers.ModelSerializer):
+class DoctorVisitSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Achievement
+        model = DoctorVisit
         fields = "__all__"

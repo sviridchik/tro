@@ -23,4 +23,5 @@ urlpatterns = [
     path('statistic/', include('statistic.urls')),
     path('api/v1/auth/',include('djoser.urls')),
     path('api/v1/auth-token/',include('djoser.urls.authtoken')),
+    path('main/', include('medicine.urls')),
 ]

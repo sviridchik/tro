@@ -8,19 +8,19 @@ from .models import Schedule, Cure, TimeTable
 class ScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule
-        fields = "__all__"
+        fields = ('cycle_start','cycle_end','frequency','strict_status')
 
 
 class MainTimeTableSerializer(serializers.ModelSerializer):
     class Meta:
         model = TimeTable
-        fields = "time"
+        fields = ("time",)
 
 
 class TimeTableSerializer(serializers.ModelSerializer):
     def to_representation(self, model):
         return {
-            'Schedule': Schedule(model).data,
+            'Schedule': ScheduleSerializer(model).data,
             'Time': MainTimeTableSerializer(model).data,
         }
 
@@ -31,8 +31,8 @@ class TimeTableSerializer(serializers.ModelSerializer):
 
 class MainCureSerializer(serializers.ModelSerializer):
     class Meta:
-        model = TimeTable
-        fields = ('patient', 'title', 'dose', 'dose_type', 'type')
+        model = Cure
+        fields = ( 'title', 'dose', 'dose_type', 'type')
 
 
 class CureSerializer(serializers.ModelSerializer):
@@ -45,3 +45,5 @@ class CureSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cure
         fields = "__all__"
+
+

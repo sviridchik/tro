@@ -36,7 +36,7 @@ class MissedMed(models.Model):
     patient = models.ForeignKey(Patient, verbose_name=_("user"), on_delete=models.CASCADE)
     med = models.ForeignKey(Cure, on_delete=models.CASCADE)
     date = models.DateTimeField(verbose_name=_("date"))
-    is_informed = models.CharField(verbose_name=_("is_informed"), max_length=255, help_text="is informed guardian")
+    is_informed = models.BooleanField(verbose_name=_("is_informed"), max_length=255, help_text="is informed guardian")
 
 
 class TakenMed(models.Model):
@@ -45,3 +45,18 @@ class TakenMed(models.Model):
     date = models.DateTimeField(verbose_name=_("date"))
     is_late = models.BooleanField(verbose_name=_("is_late"), max_length=255)
     report = models.BooleanField(verbose_name=_("report"), max_length=255, help_text = "был ли включен в отчет")
+
+class Label(models.Model):
+    user = models.ManyToManyField(Patient)
+    title = models.CharField(verbose_name=_("title"), max_length=255)
+
+
+class Achievement(models.Model):
+    user = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    days_attended = models.PositiveIntegerField(verbose_name=_("days_attended"))
+    days_no_miss = models.PositiveIntegerField(verbose_name=_("days_no_miss"))
+    number_in_time = models.PositiveIntegerField(verbose_name=_("number_in_time"))
+
+    # Гуишкой похвалу
+    praise_from_guard = models.PositiveIntegerField(verbose_name=_("praise_from_guard"),
+                                                    help_text="количество раз похвалы")
