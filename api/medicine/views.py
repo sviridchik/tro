@@ -49,7 +49,7 @@ class TimeTableView(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         # TODO:to make it right
 
-        cures = Cure.objects.all()
+        cures = Cure.objects.filter(user=request.user.patient)
 
         date_data = request.GET.get("date_data").split(".")
         for i in range(len(date_data)):

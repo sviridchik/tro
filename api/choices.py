@@ -12,29 +12,29 @@ LANGUAGE_CHOICES = [
 ]
 
 TYPE_CHOICES = [
-    ('УКОЛ', 'УКОЛ'),
-    ('АМПУЛА', 'АМПУЛА'),
-    ('ТАБЛЕТКА', 'ТАБЛЕТКА'),
-    ('СУСПЕНЗИЯ', 'СУСПЕНЗИЯ'),
+    ('injection', 'injection'),
+    ('ampule', 'ampule'),
+    ('pill', 'pill'),
+    ('SUSPENSION', 'SUSPENSION'),
 ]
 SPEC_CHOICES = [
-    ('эндокринолог', 'эндокринолог'),
-    ('невролог', 'невролог'),
-    ('терапевт', 'терапевт'),
-    ('кардиолог', 'кардиолог'),
-    ('окулист', 'окулист'),
-    ('диетолог', 'диетолог'),
-    ('хирург', 'хирург'),
+    ('endocrinologist', 'endocrinologist'),
+    ('neurologist', 'neurologist'),
+    ('therapist', 'therapist'),
+    ('cardiologist', 'cardiologist'),
+    ('ophthalmologist', 'ophthalmologist'),
+    ('nutritionist', 'nutritionist'),
+    ('surgeon', 'surgeon'),
 ]
 STRICT_CHOICES = [
-    ('До еды', 'До еды'),
-    ('Во время еды', 'Во время еды'),
-    ('После еды', 'После еды'),
-    ('Неважно', 'Неважно')
+    ('Before meals', 'Before meals'),
+    ('While eating', 'While eating'),
+    ('After meal', 'After meal'),
+    ('No matter', 'No matter')
 ]
 DOSE_CHOICES = [
-    ('шт', 'шт'),
-    ('мл', 'мл'),
+    ('PCS', 'PCS'),
+    ('ml', 'ml'),
 ]
 DEVISE_CHOICES = [
     ('tablet', 'tablet'),
