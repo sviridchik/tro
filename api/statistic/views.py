@@ -1,12 +1,15 @@
 import datetime
-
+import json
+import math
+import numpy as np
+import matplotlib.pyplot as plt
 from rest_framework import viewsets
 from rest_framework import generics
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from .models import Devise, Logs, MissedMed, TakenMed,Achievement,Label
+from .models import Devise, Logs, MissedMed, TakenMed,Achievement,Label,ReportDot
 from .serializers import DeviseSerializer, LogsSerializer, MissedMedSerializer, TakenMedSerializer,AchievementSerializer,LabelSerializer
 
 class AnalyticTakenView(generics.ListAPIView):
@@ -78,3 +81,44 @@ class MissedMedViewSet(viewsets.ModelViewSet):
 class TakenMedViewSet(viewsets.ModelViewSet):
     queryset = TakenMed.objects.all()
     serializer_class = TakenMedSerializer
+
+
+
+class AnalyticTakenView(generics.ListAPIView):
+    permission_classes = (AllowAny,)
+    queryset = TakenMed.objects.all()
+    serializer_class = TakenMedSerializer
+
+    def get_queryset(self):
+        return super().get_queryset()
+
+    def list(self, request, *args, **kwargs):
+        # TODO:to make it right (чтобы только для конкретного пользователя)
+        report = ReportDot.objects.all()
+        x = report.x
+        y = report.y
+        # x = [1, 2, 0, 4, 5, 9, 1, 0, 7, 8]
+        # y = [1, 1, 0, 0, 0, 2, 3, 4, 5, 0]
+
+        barWidth = 0.3
+        r1 = np.arange(len(x))
+        r2 = [x + barWidth for x in r1]
+        # print(list(data.keys())[1:-2], list(data.values())[1:-2])
+        plt.bar(r1, x, width=barWidth, color='blue', edgecolor='black', capsize=7, label='3')
+
+        # Create cyan bars
+        plt.bar(r2, y, width=barWidth, color='orange', edgecolor='black', capsize=7, label='4')
+        titles = []
+        for i in range(len(x)):
+            titles.append(str(i))
+        # general layout
+        plt.xticks([r + barWidth for r in range(len(x))], titles, rotation=90, fontsize=5)
+        plt.ylabel('height')
+        plt.subplots_adjust(bottom=0.5, top=0.99)
+
+        plt.legend()
+
+        # Show graphic
+        plt.show()
+
+        return Response({}, status=status.HTTP_200_OK)

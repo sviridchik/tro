@@ -124,7 +124,7 @@ class Tariff(models.Model):
 
 
 class Tranzaction(models.Model):
-    bill = models.CharField(verbose_name=_("acbilltion"), max_length=255)
+    bill = models.CharField(verbose_name=_("bill"), max_length=255)
     date = models.DateTimeField(verbose_name=_("date_start"))
     method = models.CharField(verbose_name=_("billing method"), max_length=255)
     user = models.ForeignKey(Patient, on_delete=models.CASCADE)

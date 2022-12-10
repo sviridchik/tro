@@ -8,6 +8,7 @@ from managment.models import Patient
 from medicine.models import Cure
 
 
+
 class Report(models.Model):
     patient = models.ForeignKey(Patient, verbose_name=_("user"), on_delete=models.CASCADE)
     title = models.CharField(verbose_name=_("title"), max_length=255)
@@ -17,17 +18,22 @@ class Report(models.Model):
 
 
 class ReportDot(models.Model):
+    # TODO:in diagramm
+    patient = models.ForeignKey(Patient, verbose_name=_("user"), on_delete=models.CASCADE)
     report = models.ForeignKey(Report, verbose_name=_('report'), on_delete=models.CASCADE)
-    x = models.FloatField(verbose_name="x")
-    y = models.FloatField(verbose_name="y")
+    # TODO: I NEED LIST!!!!!!!
+    x = models.FloatField(verbose_name="x",help_text="колво принятых")
+    y = models.FloatField(verbose_name="y",help_text="колво не принятых")
 
 
 class Devise(models.Model):
+    patient = models.ForeignKey(Patient, verbose_name=_("user"), on_delete=models.CASCADE)
     api = models.CharField(verbose_name=_("api"), max_length=255)
     type_of_devise = models.CharField(verbose_name=_("type_of_devise"), max_length=255, choices=DEVISE_CHOICES)
 
 
 class Logs(models.Model):
+    patient = models.ForeignKey(Patient, verbose_name=_("user"), on_delete=models.CASCADE)
     action = models.CharField(verbose_name=_("action"), max_length=255)
     date = models.DateTimeField(verbose_name=_("date"))
 

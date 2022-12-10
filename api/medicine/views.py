@@ -21,8 +21,8 @@ class MainView(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         # TODO:to make it right
-        # cures = Cure.objects.filter(user=request.user)
-        cures = Cure.objects.all()
+        cures = Cure.objects.filter(user=request.user.patient)
+        # cures = Cure.objects.all()
 
         today = datetime.datetime.now().date()
         res = []
