@@ -6,18 +6,22 @@ from .models import Schedule, Cure, TimeTable
 # from api.managment.serializers import PatientSerializer
 
 class ScheduleSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
+
     class Meta:
         model = Schedule
-        fields = ('cycle_start','cycle_end','frequency','strict_status')
+        fields = ('id','cycle_start','cycle_end','frequency','strict_status')
 
 
 class MainTimeTableSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = TimeTable
         fields = ("time",)
 
 
 class TimeTableSerializer(serializers.ModelSerializer):
+
     def to_representation(self, model):
         return {
             'Schedule': ScheduleSerializer(model).data,
@@ -30,12 +34,21 @@ class TimeTableSerializer(serializers.ModelSerializer):
 
 
 class MainCureSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+
+    def create(self, validated_data):
+        validated_data['patient'] = self.context['request'].user.patient
+        print(validated_data)
+        cure = super().create(validated_data)
+        return cure
+
     class Meta:
         model = Cure
-        fields = ( 'title', 'dose', 'dose_type', 'type')
+        fields = ('id' ,'title', 'dose', 'dose_type', 'type')
 
 
 class CureSerializer(serializers.ModelSerializer):
+
     def to_representation(self, model):
         return {
             'cure': MainCureSerializer(model).data,

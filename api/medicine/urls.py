@@ -1,6 +1,6 @@
 from rest_framework import routers
 from django.urls import path, include, re_path
-from .views import CureViewSet, ScheduleViewSet, TimeTableViewSet,MainView,TimeTableView
+from .views import CureViewSet, ScheduleViewSet, TimeTableViewSet,MainView,TimeTableView,CollectStatisticView
 
 router = routers.DefaultRouter()
 router.register('cure', CureViewSet, basename='cure')
@@ -12,6 +12,7 @@ urlpatterns = [
     path('screen/', MainView.as_view()),
     # re_path(f'timetable/(?P<date_data>{data_pattern})/$', TimeTableView.as_view()),
     re_path(f'timetable/', TimeTableView.as_view()),
+    path('stat/', CollectStatisticView.as_view()),
 
 ]
 urlpatterns += router.urls
