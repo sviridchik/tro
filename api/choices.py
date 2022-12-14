@@ -17,6 +17,7 @@ TYPE_CHOICES = [
     ('pill', 'pill'),
     ('SUSPENSION', 'SUSPENSION'),
 ]
+
 SPEC_CHOICES = [
     ('endocrinologist', 'endocrinologist'),
     ('neurologist', 'neurologist'),
@@ -26,7 +27,7 @@ SPEC_CHOICES = [
     ('nutritionist', 'nutritionist'),
     ('surgeon', 'surgeon'),
 ]
-STRICT_CHOICES = [
+FOOD_CHOICES = [
     ('Before meals', 'Before meals'),
     ('While eating', 'While eating'),
     ('After meal', 'After meal'),

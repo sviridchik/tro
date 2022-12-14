@@ -10,7 +10,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Schedule
-        fields = ('id','cycle_start','cycle_end','frequency','strict_status')
+        fields = ('id','cycle_start','cycle_end','frequency')
 
 
 class MainTimeTableSerializer(serializers.ModelSerializer):
@@ -37,6 +37,8 @@ class MainCureSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
 
     def create(self, validated_data):
+        print('HEREEEE')
+        print(self.context['request'].user)
         validated_data['patient'] = self.context['request'].user.patient
         print(validated_data)
         cure = super().create(validated_data)
@@ -44,7 +46,7 @@ class MainCureSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cure
-        fields = ('id' ,'title', 'dose', 'dose_type', 'type')
+        fields = ('id', 'title', 'dose', 'dose_type', 'type', "schedule","food","strict_status")
 
 
 class CureSerializer(serializers.ModelSerializer):

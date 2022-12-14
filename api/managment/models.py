@@ -75,9 +75,10 @@ class Patient(models.Model):
 
 
 class Guardian(models.Model):
-    banned = models.BooleanField(_('banned'), help_text="Был ли он забанен опекуном через администратора")
-    is_send = models.BooleanField(_('is_send'), help_text="отправлять ли отчеты об опекуне")
-    relationship = models.CharField(_('relationship'), max_length=150, blank=True, help_text="родство с опекуном")
+
+    banned = models.BooleanField(_('banned'), help_text="Был ли он забанен опекуном через администратора",null=True, blank=True)
+    is_send = models.BooleanField(_('is_send'), help_text="отправлять ли отчеты об опекуне",null=True, blank=True)
+    relationship = models.CharField(_('relationship'), max_length=150, blank=True, help_text="родство с опекуном",null=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     first_name = models.CharField(_('first name'), max_length=150, blank=True)
     last_name = models.CharField(_('last name'), max_length=150, blank=True)
@@ -96,10 +97,10 @@ class Guardian(models.Model):
         ),
     )
     phone = models.BigIntegerField(verbose_name=_('phone'), default=0, blank=True, unique=True)
-    care_about = models.ManyToManyField(Patient, verbose_name=_('care about'), blank=True, null=True)
+    care_about = models.OneToOneField(Patient, verbose_name=_('care about'), blank=True, null=True, on_delete=models.DO_NOTHING)
 
     def __str__(self):
-        return self.first_name + " " + self.last_name
+        return str(self.first_name) + " " + str(self.last_name)
 
 
 class PatientSetting(models.Model):
