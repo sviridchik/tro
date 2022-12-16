@@ -8,7 +8,7 @@ from managment.models import Patient
 from rest_framework import generics
 from rest_framework import status
 from rest_framework import viewsets
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from statistic.models import TakenMed, MissedMed
 from statistic.serializers import TakenMedSerializer
@@ -19,7 +19,7 @@ from .serializers import CureSerializer, ScheduleSerializer, MainCureSerializer,
 
 
 class MainView(generics.ListAPIView):
-    permission_classes = (AllowAny,)
+    # permission_classes = (IsAuthenticated,)
     queryset = Cure.objects.all()
     serializer_class = CureSerializer
 
@@ -51,7 +51,7 @@ class MainView(generics.ListAPIView):
 
 
 class TimeTableView(generics.ListAPIView):
-    permission_classes = (AllowAny,)
+    # permission_classes = (IsAuthenticated,)
     queryset = Cure.objects.all()
     serializer_class = CureSerializer
 
@@ -61,7 +61,7 @@ class TimeTableView(generics.ListAPIView):
 
 class CollectStatisticView(generics.ListAPIView):
     """отчет за последни е 10 дней"""
-    permission_classes = (AllowAny,)
+    # permission_classes = (IsAuthenticated,)
     queryset = Cure.objects.all()
     serializer_class = CureSerializer
 
@@ -119,7 +119,7 @@ class CollectStatisticView(generics.ListAPIView):
 
 
 class TakeViewSet(generics.RetrieveAPIView):
-    # permission_classes = (AllowAny,)
+    # permission_classes = (IsAuthenticated,)
     queryset = Cure.objects.all()
 
     def get(self, request, pk, *args, **kwargs):
@@ -158,6 +158,7 @@ class TakeViewSet(generics.RetrieveAPIView):
 class CureViewSet(viewsets.ModelViewSet):
     queryset = Cure.objects.all()
     serializer_class = MainCureSerializer
+    # permission_classes = (IsAuthenticated,)
 
     def create(self, request, *args, **kwargs):
         resp = super().create(request, *args, **kwargs)
@@ -168,8 +169,10 @@ class CureViewSet(viewsets.ModelViewSet):
 class ScheduleViewSet(viewsets.ModelViewSet):
     queryset = Schedule.objects.all()
     serializer_class = ScheduleSerializer
+    # permission_classes = (IsAuthenticated,)
 
 
 class TimeTableViewSet(viewsets.ModelViewSet):
     queryset = TimeTable.objects.all()
     serializer_class = MainTimeTableSerializer
+    # permission_classes = (IsAuthenticated,)

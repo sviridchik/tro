@@ -37,10 +37,10 @@ class MainCureSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
 
     def create(self, validated_data):
-        print('HEREEEE')
-        print(self.context['request'].user)
+        # print('HEREEEE')
+        # print(self.context['request'].user)
         validated_data['patient'] = self.context['request'].user.patient
-        print(validated_data)
+        # print(validated_data)
         cure = super().create(validated_data)
         return cure
 

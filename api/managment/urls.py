@@ -1,8 +1,8 @@
 from rest_framework import routers
-
+from django.urls import path
 from .views import PatientViewSet, PatientSettingViewSet, GuardianViewSet, \
     TokensViewSet, TariffViewSet, TranzactionViewSet,\
-    DoctorViewSet,DoctorVisitViewSet
+    DoctorViewSet,DoctorVisitViewSet,WhoIAmView
 
 router = routers.DefaultRouter()
 router.register('patients', PatientViewSet, basename='patients')
@@ -14,5 +14,7 @@ router.register('tranzaction', TranzactionViewSet, basename='tranzaction')
 router.register('doctor', DoctorViewSet, basename='doctor')
 router.register('doctorvisit', DoctorVisitViewSet, basename='doctorvisit')
 
-urlpatterns = []
+urlpatterns = [
+   path('whoiam/', WhoIAmView.as_view()),
+]
 urlpatterns += router.urls
