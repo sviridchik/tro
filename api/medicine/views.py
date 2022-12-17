@@ -14,49 +14,8 @@ from statistic.models import TakenMed, MissedMed
 from statistic.serializers import TakenMedSerializer
 
 from .models import Cure, TimeTable, Schedule
-from .serializers import CureSerializer, ScheduleSerializer, MainCureSerializer, \
-    MainTimeTableSerializer
-
-
-class MainView(generics.ListAPIView):
-    # permission_classes = (IsAuthenticated,)
-    queryset = Cure.objects.all()
-    serializer_class = CureSerializer
-
-    def get_queryset(self):
-        return super().get_queryset()
-
-    def create(self, request, *args, **kwargs):
-        resp = super().create(request, *args, **kwargs)
-        patient: Patient = request.user.patient
-        return resp
-
-    def list(self, request, *args, **kwargs):
-        # TODO:to make it right
-        cures = Cure.objects.filter(user=request.user.patient)
-        # cures = Cure.objects.all()
-
-        today = datetime.datetime.now().date()
-        res = []
-        for cure in cures:
-            if cure.schedule.cycle_start <= today and cure.schedule.cycle_end >= today:
-                tmp = {}
-                tmp["cure"] = MainCureSerializer(cure).data
-                tmp["time"] = MainTimeTableSerializer(TimeTable.objects.filter(schedule=cure.schedule), many=True).data
-                res.append(tmp)
-
-        res = {"data": res}
-
-        return Response(res, status=status.HTTP_200_OK)
-
-
-class TimeTableView(generics.ListAPIView):
-    # permission_classes = (IsAuthenticated,)
-    queryset = Cure.objects.all()
-    serializer_class = CureSerializer
-
-    def get_queryset(self):
-        return super().get_queryset()
+from .serializers import CureSerializer, MainScheduleSerializer, MainCureSerializer, \
+    MainTimeTableSerializer, ViewOnlyCureSerializer
 
 
 class CollectStatisticView(generics.ListAPIView):
@@ -157,23 +116,26 @@ class TakeViewSet(generics.RetrieveAPIView):
 
 
 class CureViewSet(viewsets.ModelViewSet):
-    queryset = Cure.objects.all()
     serializer_class = MainCureSerializer
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
-    def create(self, request, *args, **kwargs):
-        resp = super().create(request, *args, **kwargs)
-        patient: Patient = request.user.patient
-        return resp
+    def get_serializer_class(self):
+        if self.action in ['list', 'retrieve']:
+            return ViewOnlyCureSerializer
+        else:
+            return MainCureSerializer
+
+    def get_queryset(self):
+        return Cure.objects.filter(patient__user=self.request.user)
 
 
 class ScheduleViewSet(viewsets.ModelViewSet):
     queryset = Schedule.objects.all()
-    serializer_class = ScheduleSerializer
-    # permission_classes = (IsAuthenticated,)
+    serializer_class = MainScheduleSerializer
+    permission_classes = (IsAuthenticated,)
 
 
 class TimeTableViewSet(viewsets.ModelViewSet):
     queryset = TimeTable.objects.all()
     serializer_class = MainTimeTableSerializer
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
