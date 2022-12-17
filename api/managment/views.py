@@ -6,7 +6,7 @@ from rest_framework import status
 
 from .models import Patient, PatientSetting, Guardian, Tariff, Tokens, Tranzaction, Doctor, DoctorVisit
 from .serializers import PatientSerializer, PatientSettingSerializer, GuardianSerializer, TariffSerializer, \
-    TokensSerializer, TranzactionSerializer, DoctorVisitSerializer, DoctorSerializer, UserSerializer
+    TokensSerializer, TranzactionSerializer, DoctorVisitSerializer, DoctorSerializer, UserSerializer, ReadOnlyDoctorVisitSerializer
 from rest_framework.permissions import IsAuthenticated
 
 
@@ -90,16 +90,13 @@ class DoctorViewSet(viewsets.ModelViewSet):
 
 
 class DoctorVisitViewSet(viewsets.ModelViewSet):
-    queryset = DoctorVisit.objects.all()
-    serializer_class = DoctorVisitSerializer
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        user = self.request.user
-        patient = Patient.objects.get(user=user)
-        return DoctorVisit.objects.filter(user=patient)
+        return DoctorVisit.objects.filter(patient__user=self.request.user)
 
-    def create(self, request, *args, **kwargs):
-        resp = super().create(request, *args, **kwargs)
-        patient: Patient = request.user.patient
-        return resp
+    def get_serializer_class(self):
+        if self.action in ['list', 'retrieve']:
+            return ReadOnlyDoctorVisitSerializer
+        else:
+            return DoctorVisitSerializer

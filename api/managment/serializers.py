@@ -79,9 +79,8 @@ class DoctorSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data['patient'] = self.context['request'].user.patient
-        cure = super().create(validated_data)
-        return cure
-    
+        return super().create(validated_data)
+
     def update(self, instance, validated_data):
         validated_data['patient'] = instance.patient
         return super().update(instance, validated_data)
@@ -95,14 +94,29 @@ class DoctorSerializer(serializers.ModelSerializer):
 
 
 class DoctorVisitSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only=True)
-    user = PatientSerializer(read_only=True, many=True)
 
     def create(self, validated_data):
         validated_data['patient'] = self.context['request'].user.patient
-        visit = super().create(validated_data)
-        return visit
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        validated_data['patient'] = instance.patient
+        return super().update(instance, validated_data)
 
     class Meta:
         model = DoctorVisit
         fields = "__all__"
+        extra_kwargs = {
+            'patient': {'default': None},
+        }
+
+
+class ReadOnlyDoctorVisitSerializer(serializers.ModelSerializer):
+    doctor = DoctorSerializer()
+
+    class Meta:
+        model = DoctorVisit
+        fields = "__all__"
+        extra_kwargs = {
+            'patient': {'default': None},
+        }
