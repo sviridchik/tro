@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Patient, PatientSetting, Guardian, Tariff, Tokens, Tranzaction
+from .models import Patient, PatientSetting, Guardian, Tariff, Tokens, Tranzaction,DoctorVisit,Doctor
 # Register your models here.
 @admin.register(Patient)
 class PatientAdmin(admin.ModelAdmin):
@@ -23,4 +23,12 @@ class TokensAdmin(admin.ModelAdmin):
 
 @admin.register(Tranzaction)
 class TranzactionAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(Doctor)
+class DoctorAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(DoctorVisit)
+class DoctorVisitAdmin(admin.ModelAdmin):
     pass

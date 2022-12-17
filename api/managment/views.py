@@ -15,8 +15,8 @@ class WhoIAmView(generics.ListAPIView):
     serializer_class = UserSerializer
 
     def list(self, request, *args, **kwargs):
-        user = User.objects.all()[0]
-        # user = request.user
+        # user = User.objects.all()[0]
+        user = request.user
         patient = Patient.objects.filter(user=user)
         guardian = Guardian.objects.filter(user=user)
         res = {"type":None,

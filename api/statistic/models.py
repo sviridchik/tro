@@ -18,10 +18,8 @@ class Report(models.Model):
 
 
 class ReportDot(models.Model):
-    # TODO:in diagramm
     patient = models.ForeignKey(Patient, verbose_name=_("user"), on_delete=models.CASCADE)
     report = models.ForeignKey(Report, verbose_name=_('report'), on_delete=models.CASCADE)
-    # TODO: I NEED LIST!!!!!!!
     x = models.FloatField(verbose_name="x",help_text="колво принятых")
     y = models.FloatField(verbose_name="y",help_text="колво не принятых")
 

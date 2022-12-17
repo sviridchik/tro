@@ -6,18 +6,19 @@ from .models import Schedule, Cure, TimeTable
 # from api.managment.serializers import PatientSerializer
 
 class ScheduleSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField()
+    # id = serializers.IntegerField()
+    # timesheet = MainTimeTableSerializer
 
     class Meta:
         model = Schedule
-        fields = ('id','cycle_start','cycle_end','frequency')
+        fields = ('id','cycle_start','cycle_end','frequency',"timesheet")
 
 
 class MainTimeTableSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TimeTable
-        fields = ("time",)
+        fields = "__all__"
 
 
 class TimeTableSerializer(serializers.ModelSerializer):
