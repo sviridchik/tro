@@ -68,6 +68,7 @@ class Doctor(models.Model):
     first_name = models.CharField(_('first name'), max_length=150, blank=True)
     last_name = models.CharField(_('last name'), max_length=150, blank=True)
     specialty = models.CharField(_('specialty'), max_length=150, blank=True,choices=SPEC_CHOICES)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
 
 
 class DoctorVisit(models.Model):
