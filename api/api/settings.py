@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-wh#xg+dk6a^8*3d8b-xv2qa2q7ww)x7j1)l(h=^-t0-)ecfiea
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['61f2-37-214-82-117.eu.ngrok.io', '127.0.0.1']
 
 
 # Application definition
@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'api.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'trpo',
+        'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         'HOST': '127.0.0.1',
