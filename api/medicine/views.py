@@ -96,6 +96,7 @@ class CollectStatisticView(generics.ListAPIView):
         x, y = None, None
 
         with open('data.json') as json_file:
+            # raise Exception(json.load(json_file))
             data = json.load(json_file)
             x = data["data"]["taken"]
             y = data["data"]["missed"]

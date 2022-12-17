@@ -1,12 +1,12 @@
 import datetime
-
+import json
 from managment.models import Guardian
 from rest_framework import generics
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
+import numpy as np
 from .models import Devise, Logs, MissedMed, TakenMed, Achievement, Label
 from .serializers import DeviseSerializer, LogsSerializer, MissedMedSerializer, TakenMedSerializer, \
     AchievementSerializer, LabelSerializer
@@ -52,6 +52,31 @@ class AnalyticTakenGuardianView(generics.ListAPIView):
             res_missed = MissedMedSerializer(cures_missed, many=True)
         final_data["принятые"] = res.data
         final_data["пропущенные"] = res_missed.data
+        final_data["подопечный"] = patient_care_about.id
+        x, y = None, None
+
+        with open('data.json') as json_file:
+            # raise Exception(json.load(json_file))
+            for d in json.load(json_file):
+                raise Exception(d, patient_care_about.id)
+            data = json.load(json_file)
+            x = data["data"]["taken"]
+            y = data["data"]["missed"]
+        if len(x) > 10:
+            x, y = x[-10:], y[-10:]
+        barWidth = 0.3
+        r1 = np.arange(len(x))
+        r2 = [x + barWidth for x in r1]
+        plt.bar(r1, x, width=barWidth, color='blue', edgecolor='black', capsize=7, label='3')
+
+        plt.bar(r2, y, width=barWidth, color='orange', edgecolor='black', capsize=7, label='4')
+        titles = ["taken", "missed"]
+
+        plt.xticks([r + barWidth for r in range(len(x))], titles, rotation=90, fontsize=5)
+        plt.ylabel('height')
+        plt.subplots_adjust(bottom=0.5, top=0.99)
+        plt.legend()
+        plt.savefig('graf.png')
         return Response(final_data, status=status.HTTP_200_OK)
 
 
