@@ -76,3 +76,6 @@ class DoctorVisit(models.Model):
     date = models.DateTimeField(verbose_name=_("date_start"))
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ('id',)
