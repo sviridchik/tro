@@ -1,7 +1,9 @@
 from rest_framework import serializers
 
-from .models import Devise, Logs, MissedMed, TakenMed,Label,Achievement
+from .models import Devise, Logs, MissedMed, TakenMed, Label, Achievement
 from medicine.models import Cure
+
+
 class LabelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Label
@@ -12,6 +14,7 @@ class AchievementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Achievement
         fields = "__all__"
+
 
 class DeviseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,14 +27,16 @@ class LogsSerializer(serializers.ModelSerializer):
         model = Logs
         fields = "__all__"
 
+
 class MedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cure
-        fields = ("title",)
+        fields = "__all__"
 
 
 class MissedMedSerializer(serializers.ModelSerializer):
     med = MedSerializer()
+
     class Meta:
         model = MissedMed
         fields = "__all__"
@@ -39,6 +44,7 @@ class MissedMedSerializer(serializers.ModelSerializer):
 
 class TakenMedSerializer(serializers.ModelSerializer):
     med = MedSerializer()
+
     class Meta:
         model = TakenMed
         fields = "__all__"

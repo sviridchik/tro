@@ -13,6 +13,7 @@ from .serializers import DeviseSerializer, LogsSerializer, MissedMedSerializer, 
     AchievementSerializer, LabelSerializer
 import matplotlib.pyplot as plt
 
+
 class AnalyticTakenGuardianView(generics.ListAPIView):
     # permission_classes = (IsAuthenticated,)
     queryset = TakenMed.objects.all()
@@ -31,7 +32,7 @@ class AnalyticTakenGuardianView(generics.ListAPIView):
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
         guard = Guardian.objects.filter(user=user)[0]
         if guard.care_about is None:
-            return Response({"error":"no patient"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "no patient"}, status=status.HTTP_400_BAD_REQUEST)
         # raise Exception(guard.care_about,guard.care_about is None)
         patient_care_about = guard.care_about
         cures = TakenMed.objects.filter(patient=patient_care_about)
@@ -94,43 +95,29 @@ class AnalyticTakenGuardianView(generics.ListAPIView):
 
 
 class AnalyticTakenView(generics.ListAPIView):
-    # permission_classes = (IsAuthenticated,)
-    queryset = TakenMed.objects.all()
-    serializer_class = TakenMedSerializer
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        return super().get_queryset()
+        return TakenMed.objects.filter(patient__user=self.request.user)
 
     def list(self, request, *args, **kwargs):
-        # TODO:to make it right
-        final_data = {"принятые": 0,
-                      "пропущенные": 0}
-        # guardin
-        cures = TakenMed.objects.filter(user=request.user.patient)
-        cures_missed = MissedMed.objects.filter(user=request.user.patient)
+        final_data = {"taken": 0,
+                      "missed": 0}
 
-        date_data = request.GET.get("date_data")
+        cures = TakenMed.objects.filter(patient__user=request.user)
+        cures_missed = MissedMed.objects.filter(patient__user=request.user)
+        date_data = request.query_params.get("date_data")
         if date_data:
-
-            date_data = date_data.split(".")
-
-            for i in range(len(date_data)):
-
-                if date_data[i].startswith("0"):
-                    date_data[i] = date_data[i][1:]
-            date_data = [eval(el) for el in date_data]
-            date_data = datetime.date(date_data[-1], date_data[-2], date_data[-3])
-
+            print(date_data)
+            date_data = datetime.datetime.fromisoformat(date_data)
             cures = cures.filter(date__date=date_data)
             cures_missed = cures_missed.filter(date__date=date_data)
-            res = TakenMedSerializer(cures, many=True)
-            res_missed = MissedMedSerializer(cures_missed, many=True)
-        else:
-            res = TakenMedSerializer(cures, many=True)
-            res_missed = MissedMedSerializer(cures_missed, many=True)
 
-        final_data["принятые"] = res.data
-        final_data["пропущенные"] = res_missed.data
+        res = TakenMedSerializer(cures, many=True)
+        res_missed = MissedMedSerializer(cures_missed, many=True)
+
+        final_data["taken"] = res.data
+        final_data["missed"] = res_missed.data
         return Response(final_data, status=status.HTTP_200_OK)
 
 

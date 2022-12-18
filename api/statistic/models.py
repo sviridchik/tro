@@ -40,7 +40,7 @@ class MissedMed(models.Model):
     patient = models.ForeignKey(Patient, verbose_name=_("user"), on_delete=models.CASCADE)
     med = models.ForeignKey(Cure, on_delete=models.CASCADE)
     date = models.DateTimeField(verbose_name=_("date"))
-    is_informed = models.BooleanField(verbose_name=_("is_informed"), max_length=255, help_text="is informed guardian")
+    is_informed = models.BooleanField(verbose_name=_("is_informed"), help_text="is informed guardian")
 
 
 class TakenMed(models.Model):
