@@ -7,7 +7,6 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
-
 class Patient(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     first_name = models.CharField(_('first name'), max_length=150, blank=True)
@@ -15,24 +14,33 @@ class Patient(models.Model):
     age = models.PositiveIntegerField(verbose_name=_('age'), validators=[MaxValueValidator(150)])
     phone = models.BigIntegerField(verbose_name=_('phone'), default=0, blank=True, unique=True)
 
-
     def __str__(self):
         return self.first_name + " " + self.last_name
+
+    class Meta:
+        ordering = ('id',)
 
 
 class Guardian(models.Model):
 
-    banned = models.BooleanField(_('banned'), help_text="Был ли он забанен опекуном через администратора",null=True, blank=True)
-    is_send = models.BooleanField(_('is_send'), help_text="отправлять ли отчеты об опекуне",null=True, blank=True, default=False)
-    relationship = models.CharField(_('relationship'), max_length=150, blank=True, help_text="родство с опекуном",null=True)
+    banned = models.BooleanField(
+        _('banned'), help_text="Был ли он забанен опекуном через администратора", null=True, blank=True)
+    is_send = models.BooleanField(_('is_send'), help_text="отправлять ли отчеты об опекуне",
+                                  null=True, blank=True, default=False)
+    relationship = models.CharField(_('relationship'), max_length=150, blank=True,
+                                    help_text="родство с опекуном", null=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     first_name = models.CharField(_('first name'), max_length=150, blank=True)
     last_name = models.CharField(_('last name'), max_length=150, blank=True)
     phone = models.BigIntegerField(verbose_name=_('phone'), default=0, blank=True, unique=True)
-    care_about = models.OneToOneField(Patient, verbose_name=_('care about'), blank=True, null=True, on_delete=models.DO_NOTHING)
+    care_about = models.OneToOneField(Patient, verbose_name=_(
+        'care about'), blank=True, null=True, on_delete=models.DO_NOTHING)
 
     def __str__(self):
         return str(self.first_name) + " " + str(self.last_name)
+
+    class Meta:
+        ordering = ('id',)
 
 
 class PatientSetting(models.Model):
@@ -63,14 +71,20 @@ class Tranzaction(models.Model):
     user = models.ForeignKey(Patient, on_delete=models.CASCADE)
 
 
-
 class Doctor(models.Model):
     first_name = models.CharField(_('first name'), max_length=150, blank=True)
     last_name = models.CharField(_('last name'), max_length=150, blank=True)
-    specialty = models.CharField(_('specialty'), max_length=150, blank=True,choices=SPEC_CHOICES)
+    specialty = models.CharField(_('specialty'), max_length=150, blank=True, choices=SPEC_CHOICES)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ('id',)
 
 
 class DoctorVisit(models.Model):
-    user = models.ManyToManyField(Patient)
     date = models.DateTimeField(verbose_name=_("date_start"))
-    doctor = models.ForeignKey(Doctor, on_delete=models.DO_NOTHING)
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ('id',)

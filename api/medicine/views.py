@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from django.shortcuts import get_object_or_404
 from managment.models import Patient
+from django.utils import timezone
 from rest_framework import generics
 from rest_framework import status
 from rest_framework import viewsets
@@ -28,8 +29,7 @@ class CollectStatisticView(generics.ListAPIView):
         cures = Cure.objects.filter(user=request.user.patient)
         cures_taken = TakenMed.objects.filter(user=request.user.patient)
         cures_taken = [c.id for c in cures_taken]
-        today = datetime.datetime.now().date()
-        today_time = datetime.datetime.now().time()
+        today = datetime.datetime.now().astimezone(timezone.get_current_timezone()).date()
         missed_count = 0
         taken_count = 0
 
@@ -79,15 +79,13 @@ class CollectStatisticView(generics.ListAPIView):
 
 
 class TakeViewSet(generics.RetrieveAPIView):
-    # permission_classes = (IsAuthenticated,)
-    queryset = Cure.objects.all()
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, pk, *args, **kwargs):
-        queryset = Cure.objects.all()
+        queryset = Cure.objects.filter(patient__user=request.user)
         cure = get_object_or_404(queryset, pk=pk)
-        today = datetime.datetime.now().date()
-        today_time = datetime.datetime.now()
-        today_time = today_time.replace()
+        today = datetime.datetime.now().astimezone(timezone.get_current_timezone()).date()
+        today_time = datetime.datetime.now().astimezone(timezone.get_current_timezone())
         flag_is_late = True
         if cure.schedule.cycle_start <= today and cure.schedule.cycle_end >= today:
             tmp = {}
@@ -107,9 +105,9 @@ class TakeViewSet(generics.RetrieveAPIView):
                         # raise Exception(time_processed.hour ,today_time.hour)
                         break
 
-            TakenMed.objects.create(patient=request.user.patient, med=cure, date=today, report=False,
-                                    is_late=flag_is_late)
-            serializer = TakenMedSerializer(TakenMed.objects.last())
+            taken_med = TakenMed.objects.create(patient=request.user.patient, med=cure, date=today_time, report=False,
+                                                is_late=flag_is_late)
+            serializer = TakenMedSerializer(taken_med)
         else:
             return Response({"error": "no need to take it"}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data)

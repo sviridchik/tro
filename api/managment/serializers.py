@@ -9,7 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id",'email', 'username', 'password']
+        fields = ["id", 'email', 'username', 'password']
         extra_kwargs = {'password': {'write_only': True}}
 
 #     def create(self, validated_data):
@@ -40,17 +40,15 @@ class GuardianSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     care_about = PatientSerializer(read_only=True)
 
-
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
         guard = super().create(validated_data)
         return guard
 
-
     class Meta:
         model = Guardian
         # fields = "__all__"
-        exclude = ['is_send','banned']
+        exclude = ['is_send', 'banned']
 
 
 class PatientSettingSerializer(serializers.ModelSerializer):
@@ -78,20 +76,47 @@ class TranzactionSerializer(serializers.ModelSerializer):
 
 
 class DoctorSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Doctor
-        fields = "__all__"
-
-
-class DoctorVisitSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only=True)
-    user = PatientSerializer(read_only=True, many=True)
 
     def create(self, validated_data):
         validated_data['patient'] = self.context['request'].user.patient
-        visit = super().create(validated_data)
-        return visit
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        validated_data['patient'] = instance.patient
+        return super().update(instance, validated_data)
+
+    class Meta:
+        model = Doctor
+        fields = "__all__"
+        extra_kwargs = {
+            'patient': {'default': None},
+        }
+
+
+class DoctorVisitSerializer(serializers.ModelSerializer):
+
+    def create(self, validated_data):
+        validated_data['patient'] = self.context['request'].user.patient
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        validated_data['patient'] = instance.patient
+        return super().update(instance, validated_data)
 
     class Meta:
         model = DoctorVisit
         fields = "__all__"
+        extra_kwargs = {
+            'patient': {'default': None},
+        }
+
+
+class ReadOnlyDoctorVisitSerializer(serializers.ModelSerializer):
+    doctor = DoctorSerializer()
+
+    class Meta:
+        model = DoctorVisit
+        fields = "__all__"
+        extra_kwargs = {
+            'patient': {'default': None},
+        }

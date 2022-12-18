@@ -47,8 +47,8 @@ class TakenMed(models.Model):
     patient = models.ForeignKey(Patient, verbose_name=_("user"), on_delete=models.CASCADE)
     med = models.ForeignKey(Cure, on_delete=models.CASCADE)
     date = models.DateTimeField(verbose_name=_("date"))
-    is_late = models.BooleanField(verbose_name=_("is_late"), max_length=255)
-    report = models.BooleanField(verbose_name=_("report"), max_length=255, help_text = "был ли включен в отчет")
+    is_late = models.BooleanField(verbose_name=_("is_late"))
+    report = models.BooleanField(verbose_name=_("report"), help_text = "был ли включен в отчет")
 
 class Label(models.Model):
     user = models.ManyToManyField(Patient)
