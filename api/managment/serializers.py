@@ -5,21 +5,11 @@ from .models import Patient, PatientSetting, Guardian, Tariff, Tokens, Tranzacti
 
 
 class UserSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = User
         fields = ["id", 'email', 'username', 'password']
         extra_kwargs = {'password': {'write_only': True}}
-
-#     def create(self, validated_data):
-#         user = User(
-#             email=validated_data['email'],
-#             username=validated_data['username']
-#         )
-#         user.set_password(validated_data['password'])
-#         user.save()
-#         return user
 
 
 class PatientSerializer(serializers.ModelSerializer):
@@ -38,7 +28,6 @@ class PatientSerializer(serializers.ModelSerializer):
 class GuardianSerializer(serializers.ModelSerializer):
     # care_about = PatientSerializer(read_only=True)
     user = UserSerializer(read_only=True)
-    care_about = PatientSerializer(read_only=True)
 
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user

@@ -1,32 +1,30 @@
-from rest_framework import viewsets
 from django.contrib.auth.models import User
-from rest_framework import generics
-from rest_framework.response import Response
-from rest_framework import status
-
-from .models import Patient, PatientSetting, Guardian, Tariff, Tokens, Tranzaction, Doctor, DoctorVisit
-from .serializers import PatientSerializer, PatientSettingSerializer, GuardianSerializer, TariffSerializer, \
-    TokensSerializer, TranzactionSerializer, DoctorVisitSerializer, DoctorSerializer, UserSerializer, ReadOnlyDoctorVisitSerializer
+from rest_framework import generics, status, viewsets
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
+from .models import Doctor, DoctorVisit, Guardian, Patient, PatientSetting, Tariff, Tokens, Tranzaction
+from .serializers import (DoctorSerializer, DoctorVisitSerializer, GuardianSerializer, PatientSerializer,
+                          PatientSettingSerializer, ReadOnlyDoctorVisitSerializer, TariffSerializer, TokensSerializer,
+                          TranzactionSerializer, UserSerializer)
+from db.managment import filter_patient_by_user, filter_guardian_by_user
 
 
 class WhoIAmView(generics.ListAPIView):
-    # permission_classes = (IsAuthenticated,)
-    queryset = User.objects.all()
+    permission_classes = (IsAuthenticated,)
     serializer_class = UserSerializer
 
     def list(self, request, *args, **kwargs):
-        # user = User.objects.all()[0]
         user = request.user
-        patient = Patient.objects.filter(user=user)
-        guardian = Guardian.objects.filter(user=user)
+        patient = filter_patient_by_user(user.id)
+        guardian = filter_guardian_by_user(user.id)
         res = {"type": None,
                "user": None}
         if len(patient) != 0:
             res["type"] = "patient"
             res["user"] = PatientSerializer(tuple(patient)[0]).data
         elif len(guardian) != 0:
-            res["type"] = "patient"
+            res["type"] = "guardian"
             res["user"] = GuardianSerializer(tuple(guardian)[0]).data
         else:
             res["type"] = "nothing"
