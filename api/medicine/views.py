@@ -43,7 +43,7 @@ class CollectStatisticView(generics.ListAPIView):
 
                 else:
                     taken_count += 1
-
+        # TODO:
         data = {}
         with open('data.json') as json_file:
             data = json.load(json_file)
@@ -59,21 +59,21 @@ class CollectStatisticView(generics.ListAPIView):
             data = json.load(json_file)
             x = data["data"]["taken"]
             y = data["data"]["missed"]
-        if len(x) > 10:
-            x, y = x[-10:], y[-10:]
-        barWidth = 0.3
-        r1 = np.arange(len(x))
-        r2 = [x + barWidth for x in r1]
-        plt.bar(r1, x, width=barWidth, color='blue', edgecolor='black', capsize=7, label='3')
-
-        plt.bar(r2, y, width=barWidth, color='orange', edgecolor='black', capsize=7, label='4')
-        titles = ["taken", "missed"]
-
-        plt.xticks([r + barWidth for r in range(len(x))], titles, rotation=90, fontsize=5)
-        plt.ylabel('height')
-        plt.subplots_adjust(bottom=0.5, top=0.99)
-        plt.legend()
-        plt.savefig('graf.png')
+        # if len(x) > 10:
+        #     x, y = x[-10:], y[-10:]
+        # barWidth = 0.3
+        # r1 = np.arange(len(x))
+        # r2 = [x + barWidth for x in r1]
+        # plt.bar(r1, x, width=barWidth, color='blue', edgecolor='black', capsize=7, label='3')
+        #
+        # plt.bar(r2, y, width=barWidth, color='orange', edgecolor='black', capsize=7, label='4')
+        # titles = ["taken", "missed"]
+        #
+        # plt.xticks([r + barWidth for r in range(len(x))], titles, rotation=90, fontsize=5)
+        # plt.ylabel('height')
+        # plt.subplots_adjust(bottom=0.5, top=0.99)
+        # plt.legend()
+        # plt.savefig('graf.png')
 
         return Response({}, status=status.HTTP_200_OK)
 

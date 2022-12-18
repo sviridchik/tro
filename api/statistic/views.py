@@ -10,7 +10,7 @@ import numpy as np
 from .models import Devise, Logs, MissedMed, TakenMed, Achievement, Label
 from .serializers import DeviseSerializer, LogsSerializer, MissedMedSerializer, TakenMedSerializer, \
     AchievementSerializer, LabelSerializer
-
+import matplotlib.pyplot as plt
 
 class AnalyticTakenGuardianView(generics.ListAPIView):
     # permission_classes = (IsAuthenticated,)
@@ -29,6 +29,9 @@ class AnalyticTakenGuardianView(generics.ListAPIView):
         if len(Guardian.objects.filter(user=user)) == 0:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
         guard = Guardian.objects.filter(user=user)[0]
+        if guard.care_about is None:
+            return Response({"error":"no patient"}, status=status.HTTP_400_BAD_REQUEST)
+        # raise Exception(guard.care_about,guard.care_about is None)
         patient_care_about = guard.care_about
         cures = TakenMed.objects.filter(patient=patient_care_about)
         cures_missed = MissedMed.objects.filter(patient=patient_care_about)
@@ -38,6 +41,7 @@ class AnalyticTakenGuardianView(generics.ListAPIView):
             for i in range(len(date_data)):
                 if date_data[i].startswith("0"):
                     date_data[i] = date_data[i][1:]
+            # raise Exception(date_data)
             date_data = [eval(el) for el in date_data]
             date_data = datetime.date(date_data[-1], date_data[-2], date_data[-3])
             cures = cures.filter(date__date=date_data)
@@ -54,29 +58,37 @@ class AnalyticTakenGuardianView(generics.ListAPIView):
         final_data["пропущенные"] = res_missed.data
         final_data["подопечный"] = patient_care_about.id
         x, y = None, None
-
+        id_target = patient_care_about.id
         with open('data.json') as json_file:
             # raise Exception(json.load(json_file))
-            for d in json.load(json_file):
-                raise Exception(d, patient_care_about.id)
-            data = json.load(json_file)
-            x = data["data"]["taken"]
-            y = data["data"]["missed"]
+            data = json.load(json_file)["data"]
+            # print(data)
+            for d in data:
+                if d["id"] == id_target:
+                    x = d["taken"]
+                    y = d["missed"]
+
+                    # print(x, y)
         if len(x) > 10:
+
             x, y = x[-10:], y[-10:]
-        barWidth = 0.3
-        r1 = np.arange(len(x))
-        r2 = [x + barWidth for x in r1]
-        plt.bar(r1, x, width=barWidth, color='blue', edgecolor='black', capsize=7, label='3')
+        final_data["x"] = x
+        final_data["y"] = y
 
-        plt.bar(r2, y, width=barWidth, color='orange', edgecolor='black', capsize=7, label='4')
-        titles = ["taken", "missed"]
-
-        plt.xticks([r + barWidth for r in range(len(x))], titles, rotation=90, fontsize=5)
-        plt.ylabel('height')
-        plt.subplots_adjust(bottom=0.5, top=0.99)
-        plt.legend()
-        plt.savefig('graf.png')
+        # barWidth = 0.3
+        # r1 = np.arange(len(x))
+        # r2 = [x + barWidth for x in r1]
+        # # raise Exception(x, y)
+        # plt.bar(r1, x, width=barWidth, color='blue', edgecolor='black', capsize=7, label='3')
+        # # raise Exception(r1)
+        # plt.bar(r2, y, width=barWidth, color='orange', edgecolor='black', capsize=7, label='4')
+        # titles = ["taken", "missed"]
+        # raise Exception(r1,r2)
+        # plt.xticks([r + barWidth for r in range(len(x))], titles, rotation=90, fontsize=5)
+        # plt.ylabel('height')
+        # plt.subplots_adjust(bottom=0.5, top=0.99)
+        # plt.legend()
+        # plt.savefig('graf.png')
         return Response(final_data, status=status.HTTP_200_OK)
 
 
