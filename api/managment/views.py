@@ -26,7 +26,7 @@ class WhoIAmView(generics.ListAPIView):
             res["type"] = "patient"
             res["user"] = PatientSerializer(tuple(patient)[0]).data
         elif len(guardian) != 0:
-            res["type"] = "patient"
+            res["type"] = "guardian"
             res["user"] = GuardianSerializer(tuple(guardian)[0]).data
         else:
             res["type"] = "nothing"
