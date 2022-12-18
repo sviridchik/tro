@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-wh#xg+dk6a^8*3d8b-xv2qa2q7ww)x7j1)l(h=^-t0-)ecfiea
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['61f2-37-214-82-117.eu.ngrok.io', '127.0.0.1']
+ALLOWED_HOSTS = ['4c00-37-214-82-117.eu.ngrok.io', '127.0.0.1']
 
 
 # Application definition
@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'djoser',
     'rest_framework.authtoken',
     'rest_framework_swagger',
+    'db',
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
@@ -126,7 +127,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Minsk'
 
 USE_I18N = True
 
@@ -145,7 +146,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # AUTH_USER_MODEL = 'managment.Patient'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
+        'api.authentication.TokenAuthentication',
     ),
-'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
 }
