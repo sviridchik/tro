@@ -1,4 +1,4 @@
-from choices import TYPE_CHOICES,DOSE_CHOICES,FOOD_CHOICES
+from choices import TYPE_CHOICES, DOSE_CHOICES, FOOD_CHOICES
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -18,7 +18,6 @@ class Schedule(models.Model):
     timesheet = models.ManyToManyField(TimeTable, verbose_name=_('time'))
 
 
-
 class Cure(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     title = models.CharField(verbose_name=_("title"), max_length=255)
@@ -32,3 +31,6 @@ class Cure(models.Model):
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        ordering = ('id',)

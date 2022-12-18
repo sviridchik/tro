@@ -17,6 +17,9 @@ class Patient(models.Model):
     def __str__(self):
         return self.first_name + " " + self.last_name
 
+    class Meta:
+        ordering = ('id',)
+
 
 class Guardian(models.Model):
 
@@ -35,6 +38,9 @@ class Guardian(models.Model):
 
     def __str__(self):
         return str(self.first_name) + " " + str(self.last_name)
+
+    class Meta:
+        ordering = ('id',)
 
 
 class PatientSetting(models.Model):
@@ -70,6 +76,9 @@ class Doctor(models.Model):
     last_name = models.CharField(_('last name'), max_length=150, blank=True)
     specialty = models.CharField(_('specialty'), max_length=150, blank=True, choices=SPEC_CHOICES)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ('id',)
 
 
 class DoctorVisit(models.Model):

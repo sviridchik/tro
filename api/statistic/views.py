@@ -5,6 +5,7 @@ from rest_framework import generics
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from django.utils import timezone
 from rest_framework.response import Response
 import numpy as np
 from .models import Devise, Logs, MissedMed, TakenMed, Achievement, Label
@@ -45,7 +46,7 @@ class AnalyticTakenGuardianView(generics.ListAPIView):
             res = TakenMedSerializer(cures, many=True)
             res_missed = MissedMedSerializer(cures_missed, many=True)
         else:
-            date_data = datetime.datetime.now()
+            date_data = timezone.now()
             cures = cures.filter(date__date=date_data)
             cures_missed = cures_missed.filter(date__date=date_data)
             res = TakenMedSerializer(cures, many=True)
