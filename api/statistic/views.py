@@ -97,15 +97,35 @@ class AnalyticTakenGuardianView(generics.ListAPIView):
 class AnalyticTakenView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
 
-    def get_queryset(self):
-        return TakenMed.objects.filter(patient__user=self.request.user)
-
     def list(self, request, *args, **kwargs):
         final_data = {"taken": 0,
                       "missed": 0}
 
         cures = TakenMed.objects.filter(patient__user=request.user)
         cures_missed = MissedMed.objects.filter(patient__user=request.user)
+        date_data = request.query_params.get("date_data")
+        if date_data:
+            date_data = datetime.datetime.fromisoformat(date_data)
+            cures = cures.filter(date__date=date_data)
+            cures_missed = cures_missed.filter(date__date=date_data)
+
+        res = TakenMedSerializer(cures, many=True)
+        res_missed = MissedMedSerializer(cures_missed, many=True)
+
+        final_data["taken"] = res.data
+        final_data["missed"] = res_missed.data
+        return Response(final_data, status=status.HTTP_200_OK)
+
+
+class ReportTakenGuardianView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def list(self, request, *args, **kwargs):
+        final_data = {"taken": 0,
+                      "missed": 0}
+
+        cures = TakenMed.objects.filter(patient=self.request.user.guardian.care_about)
+        cures_missed = MissedMed.objects.filter(patient=self.request.user.guardian.care_about)
         date_data = request.query_params.get("date_data")
         if date_data:
             date_data = datetime.datetime.fromisoformat(date_data)
