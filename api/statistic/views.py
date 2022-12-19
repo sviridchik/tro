@@ -108,7 +108,6 @@ class AnalyticTakenView(generics.ListAPIView):
         cures_missed = MissedMed.objects.filter(patient__user=request.user)
         date_data = request.query_params.get("date_data")
         if date_data:
-            print(date_data)
             date_data = datetime.datetime.fromisoformat(date_data)
             cures = cures.filter(date__date=date_data)
             cures_missed = cures_missed.filter(date__date=date_data)
