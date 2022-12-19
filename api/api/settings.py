@@ -42,10 +42,10 @@ INSTALLED_APPS = [
     'medicine',
     'statistic',
     'rest_framework',
-    'djoser',
     'rest_framework.authtoken',
     'rest_framework_swagger',
     'db',
+    'custom_auth',
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 

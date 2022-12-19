@@ -36,13 +36,7 @@ class WhoIAmView(generics.ListAPIView):
 class PatientViewSet(viewsets.ModelViewSet):
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer
-    # permission_classes = [IsAuthenticated]
-
-    def create(self, request, *args, **kwargs):
-        resp = super().create(request, *args, **kwargs)
-        # raise Exception(request.user, type(request.user))
-        user: User = request.user
-        return resp
+    permission_classes = [IsAuthenticated]
 
 
 class PatientSettingViewSet(viewsets.ModelViewSet):
