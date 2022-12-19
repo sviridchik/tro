@@ -1,4 +1,5 @@
-from django.contrib.auth import authenticate
+# from db.datatypes import Token, User
+from db import auth
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.core import exceptions as django_exceptions
@@ -8,26 +9,16 @@ from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import ValidationError
 
 
-class UserCreateSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(style={"input_type": "password"}, write_only=True)
-
-    class Meta:
-        model = User
-        fields = ('id', 'email', 'username', 'password')
-
-    def validate(self, attrs):
-        user = User(**attrs)
-        password = attrs.get("password")
-
-        try:
-            validate_password(password, user)
-        except django_exceptions.ValidationError as e:
-            serializer_error = serializers.as_serializer_error(e)
-            raise serializers.ValidationError(
-                {"password": serializer_error["non_field_errors"]}
-            )
-
-        return attrs
+def authenticate(username, password):
+    """
+    If the given credentials are valid, return a User object.
+    """
+    try:
+        res = auth.get_user_id_by_username_and_password(username, password)
+    except:
+        return False
+    else:
+        return res
 
 
 class TokenCreateSerializer(serializers.Serializer):
@@ -35,17 +26,13 @@ class TokenCreateSerializer(serializers.Serializer):
     username = serializers.CharField(required=False)
 
     def validate(self, attrs):
+        username = attrs.get('username')
         password = attrs.get("password")
-        self.user = authenticate(
-            request=self.context.get("request"), username=attrs.get('username'), password=password
-        )
-        if not self.user:
-            self.user = User.objects.filter(username=attrs.get('username')).first()
-            if self.user and not self.user.check_password(password):
-                raise ValidationError('Unable to log in with provided credentials.')
-        if self.user and self.user.is_active:
+        self.user_id = authenticate(username=username, password=password)
+        if self.user_id:
             return attrs
-        raise ValidationError('Unable to log in with provided credentials.')
+        else:
+            raise ValidationError('Unable to log in with provided credentials.')
 
 
 class TokenSerializer(serializers.ModelSerializer):
