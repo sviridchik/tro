@@ -3,7 +3,7 @@ import json
 
 import matplotlib.pyplot as plt
 import numpy as np
-from db.medicine import create_time, delete_time, get_time, list_times, update_time, get_schedule, list_schedules, delete_schedule, update_schedule, create_schedule
+from db.medicine import create_cure, create_time, delete_cure, delete_time, get_cure, get_time, list_cures, list_times, update_cure, update_time, get_schedule, list_schedules, delete_schedule, update_schedule, create_schedule
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from managment.models import Patient
@@ -118,11 +118,38 @@ class CureViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:
             return ViewOnlyCureSerializer
-        else:
-            return MainCureSerializer
 
     def get_queryset(self):
-        return Cure.objects.filter(patient__user=self.request.user.id)
+        return Cure.objects.filter(patient__user=self.request.user.id).select_related('schedule')
+
+    def create(self, request, *args, **kwargs):
+        request.data['patient_id'] = request.user.patient.id
+        request.data['schedule_id'] = request.data.pop('schedule')
+        doc = create_cure(request.data)
+        return Response({'id': doc.id})
+
+    def update(self, request, *args, **kwargs):
+        pk = self.kwargs['pk']
+        request.data['patient_id'] = request.user.patient.id
+        request.data['schedule_id'] = request.data.pop('schedule')
+        update_cure(request.user.patient.id, pk, request.data)
+        return Response('OK')
+
+    def destroy(self, request, *args, **kwargs):
+        pk = self.kwargs['pk']
+        delete_cure(request.user.patient.id, pk)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def retrieve(self, request, *args, **kwargs):
+        pk = self.kwargs['pk']
+        model = get_cure(request.user.patient.id, pk)
+        serializer = self.get_serializer(model)
+        return Response(serializer.data)
+
+    def list(self, request, *args, **kwargs):
+        models = list_cures(request.user.patient.id)
+        serializer = self.get_serializer(models, many=True)
+        return Response(serializer.data)
 
 
 class ScheduleViewSet(viewsets.ModelViewSet):

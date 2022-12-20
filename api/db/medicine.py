@@ -1,6 +1,7 @@
-from .datatypes import TimeTable, Schedule, Cure
+from .datatypes import TimeTable, Schedule, Cure, Patient
 from .utils import conn_cursor, get_create_values, get_set_items, get_create_keys
 from typing import List
+
 
 # TIMETABLE
 
@@ -232,3 +233,130 @@ RETURNING "medicine_schedule"."id"
             cur.execute(query)
 
     return schedule
+
+
+# CURE
+
+
+def get_cure(patient_id, cure_id):
+    query = f"""
+SELECT 
+    "medicine_cure"."id",
+    "medicine_cure"."patient_id",
+    "medicine_cure"."title",
+    "medicine_cure"."dose",
+    "medicine_cure"."dose_type",
+    "medicine_cure"."schedule_id",
+    "medicine_cure"."type",
+    "medicine_cure"."strict_status",
+    "medicine_cure"."food",
+    "medicine_schedule"."id",
+    "medicine_schedule"."cycle_start",
+    "medicine_schedule"."cycle_end",
+    "medicine_schedule"."frequency"
+FROM "medicine_cure"
+    INNER JOIN "managment_patient" ON (
+        "medicine_cure"."patient_id" = "managment_patient"."id"
+    )
+    INNER JOIN "medicine_schedule" ON (
+        "medicine_cure"."schedule_id" = "medicine_schedule"."id"
+    )
+WHERE "managment_patient"."id" = {patient_id} AND "medicine_cure"."id" = {cure_id}
+LIMIT 21
+    """
+
+    with conn_cursor() as cur:
+        cur.execute(query)
+        records = cur.fetchall()
+
+    if not records:
+        return None
+
+    r = records[0]
+    schedule = Schedule(id=r[9], cycle_start=r[10], cycle_end=r[11], frequency=r[12])
+    cure = Cure(id=r[0], patient=Patient(id=r[1]), title=r[2], dose=r[3], dose_type=r[4], schedule=schedule,
+                type=r[6], strict_status=r[7], food=r[8])
+    return cure
+
+
+def list_cures(patient_id):
+    query = f"""
+SELECT 
+    "medicine_cure"."id",
+    "medicine_cure"."patient_id",
+    "medicine_cure"."title",
+    "medicine_cure"."dose",
+    "medicine_cure"."dose_type",
+    "medicine_cure"."schedule_id",
+    "medicine_cure"."type",
+    "medicine_cure"."strict_status",
+    "medicine_cure"."food",
+    "medicine_schedule"."id",
+    "medicine_schedule"."cycle_start",
+    "medicine_schedule"."cycle_end",
+    "medicine_schedule"."frequency"
+FROM "medicine_cure"
+    INNER JOIN "managment_patient" ON (
+        "medicine_cure"."patient_id" = "managment_patient"."id"
+    )
+    INNER JOIN "medicine_schedule" ON (
+        "medicine_cure"."schedule_id" = "medicine_schedule"."id"
+    )
+WHERE "managment_patient"."id" = {patient_id}
+ORDER BY "medicine_cure"."id" ASC
+    """
+
+    with conn_cursor() as cur:
+        cur.execute(query)
+        records = cur.fetchall()
+
+    result = list()
+
+    for r in records:
+        schedule = Schedule(id=r[9], cycle_start=r[10], cycle_end=r[11], frequency=r[12])
+        cure = Cure(id=r[0], patient=Patient(id=r[1]), title=r[2], dose=r[3], dose_type=r[4], schedule=schedule,
+                    type=r[6], strict_status=r[7], food=r[8])
+        result.append(cure)
+
+    return result
+
+
+def delete_cure(patient_id, cure_id):
+    query = f"""
+BEGIN;
+DELETE FROM "statistic_missedmed" WHERE "statistic_missedmed"."med_id" IN ({cure_id});
+DELETE FROM "statistic_takenmed" WHERE "statistic_takenmed"."med_id" IN ({cure_id});
+DELETE FROM "medicine_cure" WHERE "medicine_cure"."id" IN ({cure_id});
+COMMIT;
+    """
+
+    with conn_cursor() as cur:
+        cur.execute(query)
+
+
+def update_cure(patient_id, cure_id, data):
+    set_statement = get_set_items(data.items())
+    query = f"""
+UPDATE "medicine_cure"
+SET {set_statement}
+WHERE "medicine_cure"."id" = {cure_id}
+    """
+
+    with conn_cursor() as cur:
+        cur.execute(query)
+
+
+def create_cure(data):
+    create_values = get_create_values(data.values())
+    create_keys = get_create_keys(data.keys())
+    query = f"""
+INSERT INTO "medicine_cure" ({create_keys})
+VALUES ({create_values})
+RETURNING "medicine_cure"."id"
+    """
+
+    with conn_cursor() as cur:
+        cur.execute(query)
+        records = cur.fetchall()
+
+    return Cure(id=records[0][0])
