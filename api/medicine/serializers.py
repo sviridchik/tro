@@ -14,7 +14,7 @@ class MainScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Schedule
-        fields = ('cycle_start', 'cycle_end', 'frequency', 'timesheet')
+        fields = ('id', 'cycle_start', 'cycle_end', 'frequency', 'timesheet')
 
 
 class ViewOnlyScheduleSerializer(serializers.ModelSerializer):

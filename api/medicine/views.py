@@ -3,7 +3,7 @@ import json
 
 import matplotlib.pyplot as plt
 import numpy as np
-from db.medicine import create_time, delete_time, get_time, list_times, update_time
+from db.medicine import create_time, delete_time, get_time, list_times, update_time, get_schedule, list_schedules, delete_schedule, update_schedule, create_schedule
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from managment.models import Patient
@@ -126,9 +126,33 @@ class CureViewSet(viewsets.ModelViewSet):
 
 
 class ScheduleViewSet(viewsets.ModelViewSet):
-    queryset = Schedule.objects.all()
     serializer_class = MainScheduleSerializer
     permission_classes = (IsAuthenticated,)
+
+    def create(self, request, *args, **kwargs):
+        doc = create_schedule(request.data)
+        return Response({'id': doc.id})
+
+    def update(self, request, *args, **kwargs):
+        pk = self.kwargs['pk']
+        update_schedule(request.user.patient.id, pk, request.data)
+        return Response('OK')
+
+    def destroy(self, request, *args, **kwargs):
+        pk = self.kwargs['pk']
+        delete_schedule(request.user.patient.id, pk)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def retrieve(self, request, *args, **kwargs):
+        pk = self.kwargs['pk']
+        model = get_schedule(request.user.patient.id, pk)
+        serializer = self.get_serializer(model)
+        return Response(serializer.data)
+
+    def list(self, request, *args, **kwargs):
+        models = list_schedules(request.user.patient.id)
+        serializer = self.get_serializer(models, many=True)
+        return Response(serializer.data)
 
 
 class TimeTableViewSet(viewsets.ModelViewSet):

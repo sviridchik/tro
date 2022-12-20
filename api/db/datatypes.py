@@ -76,6 +76,7 @@ class DoctorVisit(BaseDataclass):
 @dataclass
 class TimeTable(BaseDataclass):
     time: datetime.time = None
+    schedule_id: int = None
 
 
 @dataclass
