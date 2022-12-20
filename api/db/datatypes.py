@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from datetime import datetime
+import datetime
+from typing import List
 
 
 @dataclass
@@ -27,7 +28,7 @@ class User(BaseDataclass):
 class Token(BaseDataclass):
     key: str = None
     user: User = None
-    created: datetime = None
+    created: datetime.datetime = None
 
 
 @dataclass
@@ -67,6 +68,35 @@ class Doctor(BaseDataclass):
 
 @dataclass
 class DoctorVisit(BaseDataclass):
-    date: datetime = None
+    date: datetime.datetime = None
     doctor: Doctor = None
     patient: Patient = None
+
+
+@dataclass
+class TimeTable(BaseDataclass):
+    time: datetime.time = None
+
+
+@dataclass
+class Schedule(BaseDataclass):
+    cycle_start: datetime.date = None
+    cycle_end: datetime.date = None
+    frequency: int = None
+    timesheet: List[TimeTable] = None
+
+
+@dataclass
+class Cure(BaseDataclass):
+    patient: Patient = None
+    title: str = None
+    dose: float = None
+    dose_type: str = None
+    schedule: Schedule = None
+    type: str = None
+    strict_status: bool = None
+
+    food: str = None
+
+    def __str__(self):
+        return self.title

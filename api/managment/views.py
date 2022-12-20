@@ -78,9 +78,6 @@ class DoctorViewSet(viewsets.ModelViewSet):
     serializer_class = DoctorSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        return Doctor.objects.filter(patient__user=self.request.user.id)
-
     def create(self, request, *args, **kwargs):
         doc = create_doctor(list(request.data.values()) + [request.user.patient.id])
         return Response({'id': doc.id})
@@ -109,9 +106,6 @@ class DoctorViewSet(viewsets.ModelViewSet):
 
 class DoctorVisitViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return DoctorVisit.objects.filter(patient__user=self.request.user.id)
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:

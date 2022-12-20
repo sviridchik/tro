@@ -7,14 +7,14 @@ class MainTimeTableSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TimeTable
-        fields = '__all__'
+        fields = ('time', 'id')
 
 
 class MainScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Schedule
-        fields = '__all__'
+        fields = ('cycle_start', 'cycle_end', 'frequency', 'timesheet')
 
 
 class ViewOnlyScheduleSerializer(serializers.ModelSerializer):
@@ -22,7 +22,7 @@ class ViewOnlyScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Schedule
-        fields = '__all__'
+        fields = ('cycle_start', 'cycle_end', 'frequency', 'timesheet')
 
 
 class MainCureSerializer(serializers.ModelSerializer):
@@ -42,7 +42,7 @@ class ViewOnlyCureSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cure
-        fields = '__all__'
+        fields = ('id', 'title', 'dose', 'dose_type', 'type', "schedule", "food", "strict_status")
 
 
 # ?? IDK for 10 days reports

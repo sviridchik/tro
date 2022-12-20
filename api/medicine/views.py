@@ -3,20 +3,19 @@ import json
 
 import matplotlib.pyplot as plt
 import numpy as np
+from db.medicine import create_time, delete_time, get_time, list_times, update_time
 from django.shortcuts import get_object_or_404
-from managment.models import Patient
 from django.utils import timezone
-from rest_framework import generics
-from rest_framework import status
-from rest_framework import viewsets
+from managment.models import Patient
+from rest_framework import generics, status, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from statistic.models import TakenMed, MissedMed
+from statistic.models import MissedMed, TakenMed
 from statistic.serializers import TakenMedSerializer
 
-from .models import Cure, TimeTable, Schedule
-from .serializers import CureSerializer, MainScheduleSerializer, MainCureSerializer, \
-    MainTimeTableSerializer, ViewOnlyCureSerializer
+from .models import Cure, Schedule, TimeTable
+from .serializers import (CureSerializer, MainCureSerializer, MainScheduleSerializer, MainTimeTableSerializer,
+                          ViewOnlyCureSerializer)
 
 
 class CollectStatisticView(generics.ListAPIView):
@@ -114,7 +113,6 @@ class TakeViewSet(generics.RetrieveAPIView):
 
 
 class CureViewSet(viewsets.ModelViewSet):
-    serializer_class = MainCureSerializer
     permission_classes = (IsAuthenticated,)
 
     def get_serializer_class(self):
@@ -134,6 +132,30 @@ class ScheduleViewSet(viewsets.ModelViewSet):
 
 
 class TimeTableViewSet(viewsets.ModelViewSet):
-    queryset = TimeTable.objects.all()
     serializer_class = MainTimeTableSerializer
     permission_classes = (IsAuthenticated,)
+
+    def create(self, request, *args, **kwargs):
+        doc = create_time(request.data)
+        return Response({'id': doc.id})
+
+    def update(self, request, *args, **kwargs):
+        visit_pk = self.kwargs['pk']
+        update_time(request.user.patient.id, visit_pk, request.data)
+        return Response('OK')
+
+    def destroy(self, request, *args, **kwargs):
+        visit_pk = self.kwargs['pk']
+        delete_time(request.user.patient.id, visit_pk)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def retrieve(self, request, *args, **kwargs):
+        visit_pk = self.kwargs['pk']
+        visit = get_time(request.user.patient.id, visit_pk)
+        serializer = self.get_serializer(visit)
+        return Response(serializer.data)
+
+    def list(self, request, *args, **kwargs):
+        visits = list_times(request.user.patient.id)
+        serializer = self.get_serializer(visits, many=True)
+        return Response(serializer.data)
