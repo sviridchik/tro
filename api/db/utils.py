@@ -28,6 +28,8 @@ def get_create_values(values):
 
     return ', '.join(res)
 
+def get_create_keys(keys):
+    return ', '.join(f'"{k}"' for k in keys)
 
 def get_set_items(items):
     res = []

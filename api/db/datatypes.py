@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 
+
 @dataclass
 class BaseDataclass:
     id: int = None
@@ -61,4 +62,11 @@ class Doctor(BaseDataclass):
     first_name: str = None
     last_name: str = None
     specialty: str = None
+    patient: Patient = None
+
+
+@dataclass
+class DoctorVisit(BaseDataclass):
+    date: datetime = None
+    doctor: Doctor = None
     patient: Patient = None

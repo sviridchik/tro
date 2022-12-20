@@ -4,10 +4,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .models import Doctor, DoctorVisit, Guardian, Patient, PatientSetting, Tariff, Tokens, Tranzaction
-from .serializers import (DoctorSerializer, DoctorVisitSerializer, GuardianSerializer, PatientSerializer,
+from .serializers import (DoctorSerializer, GuardianSerializer, PatientSerializer,
                           PatientSettingSerializer, ReadOnlyDoctorVisitSerializer, TariffSerializer, TokensSerializer,
                           TranzactionSerializer, UserSerializer)
 from db.managment import filter_patient_by_user, filter_guardian_by_user, get_doctor, list_doctors, delete_doctor, update_doctor, create_doctor
+from db.visits import create_visit, get_visit, list_visits, update_visit, delete_visit
 
 
 class WhoIAmView(generics.ListAPIView):
@@ -115,5 +116,31 @@ class DoctorVisitViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:
             return ReadOnlyDoctorVisitSerializer
-        else:
-            return DoctorVisitSerializer
+
+    def create(self, request, *args, **kwargs):
+        request.data['patient_id'] = request.user.patient.id
+        request.data['doctor_id'] = request.data.pop('doctor')
+        doc = create_visit(request.data)
+        return Response({'id': doc.id})
+
+    def update(self, request, *args, **kwargs):
+        visit_pk = self.kwargs['pk']
+        request.data['doctor_id'] = request.data.pop('doctor')
+        update_visit(request.user.patient.id, visit_pk, request.data)
+        return Response('OK')
+
+    def destroy(self, request, *args, **kwargs):
+        visit_pk = self.kwargs['pk']
+        delete_visit(request.user.patient.id, visit_pk)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def retrieve(self, request, *args, **kwargs):
+        visit_pk = self.kwargs['pk']
+        visit = get_visit(request.user.patient.id, visit_pk)
+        serializer = self.get_serializer(visit)
+        return Response(serializer.data)
+
+    def list(self, request, *args, **kwargs):
+        visits = list_visits(request.user.patient.id)
+        serializer = self.get_serializer(visits, many=True)
+        return Response(serializer.data)

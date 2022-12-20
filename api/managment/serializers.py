@@ -82,24 +82,6 @@ class DoctorSerializer(serializers.ModelSerializer):
         }
 
 
-class DoctorVisitSerializer(serializers.ModelSerializer):
-
-    def create(self, validated_data):
-        validated_data['patient'] = self.context['request'].user.patient
-        return super().create(validated_data)
-
-    def update(self, instance, validated_data):
-        validated_data['patient'] = instance.patient
-        return super().update(instance, validated_data)
-
-    class Meta:
-        model = DoctorVisit
-        fields = "__all__"
-        extra_kwargs = {
-            'patient': {'default': None},
-        }
-
-
 class ReadOnlyDoctorVisitSerializer(serializers.ModelSerializer):
     doctor = DoctorSerializer()
 
