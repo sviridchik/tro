@@ -1,6 +1,7 @@
 from datetime import datetime
 from .datatypes import Token, User
 from .utils import conn_cursor
+from django.utils import timezone
 
 
 def create_user(username, password, email):
@@ -27,7 +28,7 @@ VALUES (
         '{email}',
         false,
         true,
-        '{datetime.now().isoformat()}'
+        '{timezone.localtime().isoformat()}'
     )
 RETURNING "auth_user"."id"
 """
@@ -81,7 +82,7 @@ INSERT INTO "authtoken_token" ("key", "user_id", "created")
 VALUES (
         '{key}',
         {user_id},
-        '{datetime.now().isoformat()}'::timestamptz
+        '{timezone.localtime().isoformat()}'::timestamptz
     )
 RETURNING "authtoken_token"."key"
     """

@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-
 @dataclass
 class BaseDataclass:
     id: int = None
@@ -17,6 +16,8 @@ class User(BaseDataclass):
     email: str = None
     password: str = None
     is_active: bool = None
+
+    patient: 'Patient' = None
 
     is_authenticated = True
 
@@ -53,3 +54,11 @@ class Guardian(BaseDataclass):
 
     def __str__(self):
         return str(self.first_name) + " " + str(self.last_name)
+
+
+@dataclass
+class Doctor(BaseDataclass):
+    first_name: str = None
+    last_name: str = None
+    specialty: str = None
+    patient: Patient = None

@@ -26,8 +26,8 @@ class CollectStatisticView(generics.ListAPIView):
     serializer_class = CureSerializer
 
     def list(self, request, *args, **kwargs):
-        cures = Cure.objects.filter(user=request.user.patient)
-        cures_taken = TakenMed.objects.filter(user=request.user.patient)
+        cures = Cure.objects.filter(user=request.user.patient.id)
+        cures_taken = TakenMed.objects.filter(user=request.user.patient.id)
         cures_taken = [c.id for c in cures_taken]
         today = datetime.datetime.now().astimezone(timezone.get_current_timezone()).date()
         missed_count = 0
@@ -82,7 +82,7 @@ class TakeViewSet(generics.RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, pk, *args, **kwargs):
-        queryset = Cure.objects.filter(patient__user=request.user)
+        queryset = Cure.objects.filter(patient__user=request.user.id)
         cure = get_object_or_404(queryset, pk=pk)
         today = datetime.datetime.now().astimezone(timezone.get_current_timezone()).date()
         today_time = datetime.datetime.now().astimezone(timezone.get_current_timezone())
@@ -124,7 +124,7 @@ class CureViewSet(viewsets.ModelViewSet):
             return MainCureSerializer
 
     def get_queryset(self):
-        return Cure.objects.filter(patient__user=self.request.user)
+        return Cure.objects.filter(patient__user=self.request.user.id)
 
 
 class ScheduleViewSet(viewsets.ModelViewSet):

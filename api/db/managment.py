@@ -1,5 +1,5 @@
-from .datatypes import Patient, User, Guardian
-from .utils import conn_cursor
+from .datatypes import Patient, User, Guardian, Doctor
+from .utils import conn_cursor, get_create_values, get_set_items
 
 
 def filter_patient_by_user(user_id):
@@ -83,3 +83,97 @@ ORDER BY "managment_guardian"."id" ASC
         result.append(guard)
 
     return result
+
+
+def get_doctor(patient_id, doctor_id):
+    query = f"""
+SELECT 
+    "managment_doctor"."id",
+    "managment_doctor"."first_name",
+    "managment_doctor"."last_name",
+    "managment_doctor"."specialty",
+    "managment_doctor"."patient_id"
+FROM "managment_doctor"
+WHERE "managment_doctor"."id" = {doctor_id} AND "managment_doctor"."patient_id" = {patient_id}
+LIMIT 21
+    """
+
+    with conn_cursor() as cur:
+        cur.execute(query)
+        records = cur.fetchall()
+
+    if not records:
+        return None
+
+    r = records[0]
+    return Doctor(id=r[0], first_name=r[1], last_name=r[2], specialty=r[3], patient=Patient(id=r[4]))
+
+
+def list_doctors(patient_id):
+    query = f"""
+SELECT 
+    "managment_doctor"."id",
+    "managment_doctor"."first_name",
+    "managment_doctor"."last_name",
+    "managment_doctor"."specialty",
+    "managment_doctor"."patient_id"
+FROM "managment_doctor"
+WHERE "managment_doctor"."patient_id" = {patient_id}
+ORDER BY "managment_doctor"."id" ASC
+LIMIT 21
+    """
+
+    with conn_cursor() as cur:
+        cur.execute(query)
+        records = cur.fetchall()
+
+    result = list()
+    for r in records:
+        doctor = Doctor(id=r[0], first_name=r[1], last_name=r[2], specialty=r[3], patient=Patient(id=r[4]))
+        result.append(doctor)
+
+    return result
+
+
+def delete_doctor(patient_id, doctor_id):
+    query = f"""
+BEGIN;
+DELETE FROM "managment_doctorvisit" WHERE "managment_doctorvisit"."doctor_id" = {doctor_id};
+DELETE FROM "managment_doctor" WHERE "managment_doctor"."id" = {doctor_id} AND "managment_doctor"."patient_id" = {patient_id};
+COMMIT;
+    """
+
+    with conn_cursor() as cur:
+        cur.execute(query)
+
+
+def update_doctor(patient_id, doctor_id, **kwargs):
+    set_statement = get_set_items(kwargs.items())
+    query = f"""
+UPDATE "managment_doctor"
+SET {set_statement}
+WHERE "managment_doctor"."id" = {doctor_id} AND "managment_doctor"."patient_id" = {patient_id}
+    """
+
+    with conn_cursor() as cur:
+        cur.execute(query)
+
+
+def create_doctor(values):
+    create_values = get_create_values(values)
+    query = f"""
+INSERT INTO "managment_doctor" (
+        "first_name",
+        "last_name",
+        "specialty",
+        "patient_id"
+    )
+VALUES ({create_values})
+RETURNING "managment_doctor"."id"
+    """
+
+    with conn_cursor() as cur:
+        cur.execute(query)
+        records = cur.fetchall()
+
+    return Doctor(id=records[0][0])

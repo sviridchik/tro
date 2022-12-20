@@ -7,7 +7,7 @@ from .models import Doctor, DoctorVisit, Guardian, Patient, PatientSetting, Tari
 from .serializers import (DoctorSerializer, DoctorVisitSerializer, GuardianSerializer, PatientSerializer,
                           PatientSettingSerializer, ReadOnlyDoctorVisitSerializer, TariffSerializer, TokensSerializer,
                           TranzactionSerializer, UserSerializer)
-from db.managment import filter_patient_by_user, filter_guardian_by_user
+from db.managment import filter_patient_by_user, filter_guardian_by_user, get_doctor, list_doctors, delete_doctor, update_doctor, create_doctor
 
 
 class WhoIAmView(generics.ListAPIView):
@@ -78,14 +78,39 @@ class DoctorViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Doctor.objects.filter(patient__user=self.request.user)
+        return Doctor.objects.filter(patient__user=self.request.user.id)
+
+    def create(self, request, *args, **kwargs):
+        doc = create_doctor(list(request.data.values()) + [request.user.patient.id])
+        return Response({'id': doc.id})
+
+    def update(self, request, *args, **kwargs):
+        doc_pk = self.kwargs['pk']
+        update_doctor(request.user.patient.id, doc_pk, **request.data)
+        return Response('OK')
+
+    def destroy(self, request, *args, **kwargs):
+        doc_pk = self.kwargs['pk']
+        delete_doctor(request.user.patient.id, doc_pk)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def retrieve(self, request, *args, **kwargs):
+        doc_pk = self.kwargs['pk']
+        doctor = get_doctor(request.user.patient.id, doc_pk)
+        serializer = self.get_serializer(doctor)
+        return Response(serializer.data)
+
+    def list(self, request, *args, **kwargs):
+        doctors = list_doctors(request.user.patient.id)
+        serializer = self.get_serializer(doctors, many=True)
+        return Response(serializer.data)
 
 
 class DoctorVisitViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return DoctorVisit.objects.filter(patient__user=self.request.user)
+        return DoctorVisit.objects.filter(patient__user=self.request.user.id)
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:
